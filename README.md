@@ -1,2 +1,11 @@
-# searchts
-Extension for phpBB to search for topics created by user
+# Search
+
+## Installation
+
+Copy the extension to phpBB/ext/Ger/searchts
+
+Go to "ACP" > "Customise" > "Extensions" and enable the "Search" extension.
+
+## License
+
+[GPLv2](license.txt)
