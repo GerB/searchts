@@ -74,11 +74,10 @@ class main_listener implements EventSubscriberInterface
             $this->lang->add_lang('common', 'ger/searchts');
             
             $user_id = (int) $event['member']['user_id'];
-            $sql = 'SELECT COUNT(*) as topics ' . $this->std_query($user_id);
+            $sql = 'SELECT COUNT(*) as topics ' . $this->std_query($user_id, $this->config['ger_sts_attachments']);
             $result = $this->db->sql_query($sql);       
             $row = $this->db->sql_fetchrow($result);
             $this->db->sql_freeresult($result);
-//            $attach = ($this->config['ger_sts_attachments'] ? 
             
             $this->template->assign_vars(array(
                 'TOPICS'        => $row['topics'],
@@ -97,7 +96,7 @@ class main_listener implements EventSubscriberInterface
                 $user_id = $this->request->variable('author_id', 0);
                 if ($user_id > 0)
                 {
-                    $sql = 'SELECT t.topic_id ' . $this->std_query($user_id);
+                    $sql = 'SELECT t.topic_id ' . $this->std_query($user_id, 1);
                     $result = $this->db->sql_query($sql);  
                     while ($row = $this->db->sql_fetchrow($result)) 
                     {
@@ -113,14 +112,19 @@ class main_listener implements EventSubscriberInterface
         /**
          * DRY.
          * @param int $user_id
+         * @param bool $attach_search
          * @return string
          */
-        private function std_query($user_id)
+        private function std_query($user_id, $attach_search)
         {
-            return 'FROM ' . POSTS_TABLE . ' p, ' . TOPICS_TABLE . ' t
+            $sql = 'FROM ' . POSTS_TABLE . ' p, ' . TOPICS_TABLE . ' t
                     WHERE  t.topic_first_post_id = p.post_id
-                    AND t.topic_poster = ' . (int) $user_id . '
-                    AND post_attachment = 1';
+                    AND t.topic_poster = ' . (int) $user_id;
+            if ($attach_search) 
+            {
+                $sql.= ' AND post_attachment = 1';
+            }
+         return $sql;   
         }
         
 }
